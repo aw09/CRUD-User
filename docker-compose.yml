@@ -1,0 +1,17 @@
+# docker-compose.yml
+version: '3'
+services:
+  app:
+    build: .
+    ports:
+      - 3000:3000
+    volumes:
+      - .:/app
+      - db:/app/databases.db
+  db:
+    image: sqlite3
+    command: '"/app/databases.db"'
+    volumes:
+      - db:/app/databases.db
+volumes:
+  db:

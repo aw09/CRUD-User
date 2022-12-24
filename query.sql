@@ -1,0 +1,28 @@
+CREATE OR REPLACE TABLE User (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    username TEXT NOT NULL,
+    role_id INTEGER NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE OR REPLACE TABLE Auth (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    password_hash TEXT NOT NULL,
+    refresh_token TEXT NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE OR REPLACE TABLE Role (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+INSERT INTO Role ( name ) VALUES ( 'admin' ), ( 'user' );
+INSERT INTO User (name, role_id, username) VALUES ('Agung', 1, 'agung');
+INSERT INTO Auth (user_id, password_hash, refresh_token) VALUES (1, '$2b$10$N8ers5zdJBRPcQgJvgUN.ui0IsEubXC.k2RyvoomWiEDe0e6uQyyq', '08c7e58eb1ee448f516b794ece1b890f7e4d12315099270aef1a0d036ebd2b15');
