@@ -2,29 +2,15 @@ const express = require('express');
 const sqlite3 = require('sqlite3');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const crypto = require('crypto');
 const server = require('./server');
 
 const app = express();
-const db = new sqlite3.Database('./databases.db');
+const db = new sqlite3.Database('./database.db');
 
 SECRET_KEY = 'secret_key'
 
+
 app.use(express.json());
-
-function createToken(user) {
-  const payload = {
-    userId: user.id,
-    exp: Math.floor(Date.now() / 1000) + (60 * 60),
-  };
-  return jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET);
-}
-
-
-function generateRefreshToken() {
-  return crypto.randomBytes(32).toString('hex');
-}
-
 
 
 const authorize = (req, res, next) => {
@@ -48,7 +34,7 @@ app.post('/refresh_token', (req, res) => {
   db.get('SELECT * FROM Auth WHERE refresh_token = ?', [refreshToken], (err, auth) => {
     if (err || !auth) return res.sendStatus(403); // Forbidden
     const user = server.getUserById(auth.user_id); // Look up the user by ID
-    const accessToken = createToken(user); // Create a new access token
+    const accessToken = server.createToken(user); // Create a new access token
     res.json({ accessToken });
   });
 });
@@ -60,6 +46,7 @@ app.post('/login', (req, res) => {
     return;
   }
   db.get('SELECT * FROM User INNER JOIN Auth ON User.id = Auth.user_id WHERE User.username = ?', [username], (err, user) => {
+    console.log(user);
     if (err) {
       res.status(500).json({ error: err.message });
       return;
@@ -73,8 +60,11 @@ app.post('/login', (req, res) => {
       res.status(400).json({ error: 'Username or password is incorrect' });
       return;
     }
-    const accessToken = createToken(user);
-    const refreshToken = generateRefreshToken();
+    const accessToken = server.createToken(user);
+    const refreshToken = server.generateRefreshToken();
+    console.log(accessToken);
+    console.log(refreshToken);
+
     db.run('UPDATE Auth SET refresh_token = ? WHERE user_id = ?', [refreshToken, user.id], (err) => {
       if (err) {
         res.status(500).json({ error: err.message });

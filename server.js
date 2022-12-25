@@ -1,4 +1,10 @@
 const sqlite3 = require('sqlite3');
+const jwt = require('jsonwebtoken');
+const crypto = require('crypto');
+
+SECRET_KEY = 'secret_key'
+
+
 const db = new sqlite3.Database('./database.db', (err) => {
     if (err) {
         console.error(err.message);
@@ -48,6 +54,22 @@ const getUserById = async (id) => {
     return result
 }
 
+const createToken = user => {
+    const payload = {
+        userId: user.id,
+        exp: Math.floor(Date.now() / 1000) + (60 * 60),
+    };
+    return jwt.sign(payload, SECRET_KEY);
+}
+
+
+const generateRefreshToken = () => {
+    return crypto.randomBytes(32).toString('hex');
+}
+
+
 module.exports = {
+    createToken: createToken,
+    generateRefreshToken: generateRefreshToken,
     getUserById: getUserById
 }
