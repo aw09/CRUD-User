@@ -1,0 +1,27 @@
+# deployment.yml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: crud-user-github
+  labels:
+    app: crud-user
+spec:
+  selector:
+    matchLabels:
+        app: crud-user
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: crud-user
+    spec:
+      containers:
+        - name: crud-user
+          image: agungw9/crud-user:latest
+          ports:
+            - containerPort: 3000
+              protocol: TCP
+          imagePullPolicy: Always
+
