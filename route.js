@@ -86,9 +86,16 @@ router.post('/login', async (req, res) => {
 
 });
 // ==================== CRUD USER ====================
-router.get('/users', authenticate, async (req, res) => {
+router.get('/users', authenticate, authorize, async (req, res) => {
     const users = await util.getUsers()
     res.json(users);
+});
+
+// Get Logged User Data
+router.get('/user', authenticate, async (req, res) => {
+    console.log(req.user);
+    const user = await util.getUserById(req.user.payload.userId)
+    res.json(user);
 });
 
 // Create a new user
